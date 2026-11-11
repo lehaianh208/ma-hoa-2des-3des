@@ -1,0 +1,6 @@
+# Chạy chương trình KHÔNG cần cài gói nào (chỉ thư viện chuẩn của Python 3.8+).
+#
+# Gói dưới đây chỉ dùng để ĐỐI CHIẾU kết quả trong tests/ (tùy chọn, bỏ trống vẫn chạy được):
+#   pip install pycryptodome cryptography   (test_des.py dùng pycryptodome, test_modes.py dùng cryptography)
+pycryptodome
+cryptography

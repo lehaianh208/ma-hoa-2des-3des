@@ -1,0 +1,501 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DES · 2DES · 3DES</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1c2330; --muted: #5d6879; --line: #dde1e8;
+  --accent: #2457d6; --accent-ink: #ffffff; --ok: #16794a; --ok-bg: #e3f4ea;
+  --bad: #b42318; --bad-bg: #fde8e6; --code-bg: #0f1623; --code-ink: #d6e2ff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12161d; --panel: #1b212b; --ink: #e6eaf0; --muted: #9aa5b6; --line: #2d3644;
+    --accent: #6e9bff; --accent-ink: #0b1220; --ok: #5ed59a; --ok-bg: #12301f;
+    --bad: #ff8a80; --bad-bg: #3a1714; --code-bg: #0b0f16; --code-ink: #cfe0ff;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { padding: 20px 16px 0; max-width: 1000px; margin: 0 auto; }
+h1 { font-size: 22px; margin: 0 0 2px; }
+header p { margin: 0; color: var(--muted); }
+nav { display: flex; gap: 4px; flex-wrap: wrap; max-width: 1000px; margin: 16px auto 0; padding: 0 16px; }
+nav button { border: 1px solid var(--line); background: var(--panel); color: var(--ink); padding: 8px 14px;
+  border-radius: 8px 8px 0 0; cursor: pointer; font: inherit; }
+nav button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+main { max-width: 1000px; margin: 0 auto; padding: 0 16px 48px; }
+section { display: none; background: var(--panel); border: 1px solid var(--line); border-radius: 0 10px 10px 10px;
+  padding: 18px; }
+section.active { display: block; }
+h2 { font-size: 17px; margin: 0 0 12px; }
+h3 { font-size: 15px; margin: 18px 0 8px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 140px; }
+.field.grow { flex: 1 1 240px; }
+label { font-size: 13px; color: var(--muted); }
+input, select, textarea { font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line);
+  border-radius: 6px; padding: 7px 9px; }
+input.mono, textarea.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13.5px; }
+textarea { min-height: 110px; resize: vertical; }
+button.primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 7px;
+  padding: 9px 16px; font: inherit; font-weight: 600; cursor: pointer; }
+button.primary:disabled { opacity: .55; cursor: wait; }
+button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent);
+  border-radius: 7px; padding: 8px 14px; font: inherit; cursor: pointer; }
+pre { background: var(--code-bg); color: var(--code-ink); padding: 12px; border-radius: 8px; overflow: auto;
+  max-height: 420px; font: 12.5px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin: 8px 0; white-space: pre-wrap;
+  word-break: break-all; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: 13px; }
+td.mono, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 12.5px; font-weight: 700; }
+.badge.ok { background: var(--ok-bg); color: var(--ok); }
+.badge.bad { background: var(--bad-bg); color: var(--bad); }
+.note { color: var(--muted); font-size: 13.5px; margin: 6px 0 12px; }
+.err { background: var(--bad-bg); color: var(--bad); padding: 9px 12px; border-radius: 7px; margin: 10px 0; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 10px 0; }
+.stat { border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; }
+.stat b { display: block; font-size: 19px; }
+.stat span { color: var(--muted); font-size: 12.5px; }
+.bar { height: 10px; background: var(--accent); border-radius: 4px; min-width: 2px; }
+.hidden { display: none !important; }
+.inline { display: flex; align-items: center; gap: 8px; }
+@media (max-width: 560px) { section { padding: 14px; } nav button { padding: 7px 10px; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>DES · 2DES · 3DES</h1>
+  <p>Cài đặt từ đầu bằng Python · mã hóa tệp · tấn công meet-in-the-middle</p>
+</header>
+
+<nav role="tablist" id="tabs">
+  <button role="tab" data-tab="crypt" aria-selected="true">Mã hóa / giải mã</button>
+  <button role="tab" data-tab="block" aria-selected="false">Từng bước (1 khối)</button>
+  <button role="tab" data-tab="sdes" aria-selected="false">S-DES (bản thu nhỏ)</button>
+  <button role="tab" data-tab="mitm" aria-selected="false">Tấn công MITM</button>
+  <button role="tab" data-tab="bench" aria-selected="false">Đo thời gian</button>
+  <button role="tab" data-tab="test" aria-selected="false">Kiểm thử</button>
+</nav>
+
+<main>
+<!-- ======================= Tab 1: mã hóa văn bản / tệp ======================= -->
+<section id="tab-crypt" class="active">
+  <h2>Mã hóa và giải mã văn bản hoặc tệp</h2>
+  <div class="row">
+    <div class="field"><label for="c-alg">Hệ mã</label>
+      <select id="c-alg"><option value="des">DES</option><option value="2des">2DES</option><option value="3des" selected>3DES</option></select></div>
+    <div class="field"><label for="c-mode">Chế độ</label>
+      <select id="c-mode"><option value="cbc">CBC (có IV)</option><option value="ecb">ECB</option></select></div>
+    <div class="field" id="c-style-wrap"><label for="c-style">Kiểu khóa 3DES</label>
+      <select id="c-style"><option value="3">3 khóa (K1, K2, K3)</option><option value="2">2 khóa (K3 = K1)</option><option value="1">1 khóa (giống DES)</option></select></div>
+    <div class="field"><label for="c-op">Thao tác</label>
+      <select id="c-op"><option value="roundtrip">Mã hóa rồi giải mã lại (kiểm tra)</option><option value="enc">Chỉ mã hóa</option><option value="dec">Chỉ giải mã</option></select></div>
+  </div>
+  <div class="row" id="c-keys"></div>
+  <div class="row"><button class="secondary" id="c-rand" type="button">Sinh khóa ngẫu nhiên</button></div>
+
+  <div class="row">
+    <div class="field grow"><label for="c-text">Văn bản (hoặc chuỗi hex nếu chọn "Chỉ giải mã")</label>
+      <textarea id="c-text" class="mono" placeholder="Nhập văn bản cần mã hóa…">Mật mã học: tấn công gặp nhau ở giữa làm 2DES chỉ mạnh ~57 bit.</textarea></div>
+    <div class="field grow"><label for="c-file">…hoặc chọn tệp (ưu tiên tệp nếu có, tối đa 2 MB)</label>
+      <input id="c-file" type="file"></div>
+  </div>
+  <button class="primary" id="c-run">Thực hiện</button>
+  <div id="c-err" class="err hidden"></div>
+  <div id="c-out" class="hidden">
+    <div class="stats" id="c-stats"></div>
+    <h3>Bản mã (hex, tối đa 256 byte đầu)</h3>
+    <pre id="c-hex"></pre>
+    <div id="c-plainbox" class="hidden">
+      <h3>Bản rõ sau giải mã</h3>
+      <pre id="c-plain"></pre>
+    </div>
+    <div class="row">
+      <button class="secondary hidden" id="c-dl-enc">Tải bản mã (.enc)</button>
+      <button class="secondary hidden" id="c-dl-dec">Tải bản rõ đã giải mã</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= Tab 2: từng bước ======================= -->
+<section id="tab-block">
+  <h2>Mã hóa một khối 64-bit và xem các bước trung gian</h2>
+  <p class="note">Dùng để đối chiếu với bản tính tay: khóa con K1…K16, L và R từng vòng, kết quả hàm F. Mặc định là ví dụ kinh điển (kết quả phải là 85E813540F0AB405).</p>
+  <div class="row">
+    <div class="field"><label for="b-alg">Hệ mã</label>
+      <select id="b-alg"><option value="des" selected>DES</option><option value="2des">2DES</option><option value="3des">3DES</option></select></div>
+    <div class="field"><label for="b-op">Thao tác</label>
+      <select id="b-op"><option value="enc">Mã hóa</option><option value="dec">Giải mã</option></select></div>
+    <div class="field" id="b-style-wrap"><label for="b-style">Kiểu khóa 3DES</label>
+      <select id="b-style"><option value="3">3 khóa</option><option value="2">2 khóa</option><option value="1">1 khóa</option></select></div>
+  </div>
+  <div class="row" id="b-keys"></div>
+  <div class="row">
+    <div class="field grow"><label for="b-data">Khối dữ liệu (hex, 16 ký tự)</label>
+      <input id="b-data" class="mono" value="0123456789ABCDEF" maxlength="16"></div>
+    <div class="field"><label>&nbsp;</label><span class="inline"><input type="checkbox" id="b-verbose" checked><label for="b-verbose" style="color:var(--ink)">In các bước trung gian</label></span></div>
+  </div>
+  <button class="primary" id="b-run">Thực hiện</button>
+  <div id="b-err" class="err hidden"></div>
+  <div id="b-out" class="hidden">
+    <div class="stats"><div class="stat"><b class="mono" id="b-result"></b><span id="b-result-label"></span></div></div>
+    <pre id="b-trace"></pre>
+  </div>
+</section>
+
+<!-- ======================= Tab: S-DES (bản thu nhỏ) ======================= -->
+<section id="tab-sdes">
+  <h2>S-DES, 2S-DES, 3S-DES: phiên bản thu nhỏ của DES</h2>
+  <p class="note">Khối 8 bit, khóa 10 bit, 2 vòng. Cấu trúc giống DES nhưng đủ nhỏ để tính tay từng bước. Mặc định là ví dụ trong giáo trình: khóa 1010000010, bản rõ 01110010 → bản mã 01110111.</p>
+  <div class="row">
+    <div class="field"><label for="sd-alg">Hệ mã</label>
+      <select id="sd-alg"><option value="sdes" selected>S-DES</option><option value="2sdes">2S-DES</option><option value="3sdes">3S-DES</option></select></div>
+    <div class="field"><label for="sd-op">Thao tác</label>
+      <select id="sd-op"><option value="enc">Mã hóa</option><option value="dec">Giải mã</option></select></div>
+    <div class="field" id="sd-style-wrap"><label for="sd-style">Kiểu khóa 3S-DES</label>
+      <select id="sd-style"><option value="3">3 khóa</option><option value="2">2 khóa</option><option value="1">1 khóa</option></select></div>
+  </div>
+  <div class="row" id="sd-keys"></div>
+  <div class="row">
+    <div class="field grow"><label for="sd-data">Khối dữ liệu (nhị phân, 8 bit)</label>
+      <input id="sd-data" class="mono" value="01110010" maxlength="8"></div>
+    <div class="field"><label>&nbsp;</label><span class="inline"><input type="checkbox" id="sd-verbose" checked><label for="sd-verbose" style="color:var(--ink)">In các bước trung gian</label></span></div>
+  </div>
+  <button class="primary" id="sd-run">Thực hiện</button>
+  <div id="sd-err" class="err hidden"></div>
+  <div id="sd-out" class="hidden">
+    <div class="stats"><div class="stat"><b class="mono" id="sd-result"></b><span id="sd-result-label"></span></div></div>
+    <pre id="sd-trace"></pre>
+  </div>
+
+  <h3>Tấn công MITM lên 2S-DES với khóa đầy đủ (2<sup>20</sup> cặp khóa)</h3>
+  <p class="note">Khác với 2DES thật, 2S-DES có khóa chỉ 10 bit nên MITM chạy được trên khóa ĐẦY ĐỦ, không cần rút gọn. Vì khối chỉ 8 bit nên cần nhiều cặp known-plaintext hơn để loại ứng viên sai.</p>
+  <div class="row">
+    <div class="field"><label for="sm-pairs">Số cặp known-plaintext</label>
+      <input id="sm-pairs" type="number" min="1" max="64" value="12"></div>
+    <div class="field"><label for="sm-seed">Seed</label>
+      <input id="sm-seed" type="number" value="1"></div>
+    <div class="field"><label>&nbsp;</label><span class="inline"><input type="checkbox" id="sm-brute"><label for="sm-brute" style="color:var(--ink)">Chạy cả vét cạn (khoảng 7 giây)</label></span></div>
+  </div>
+  <button class="primary" id="sm-run">Tấn công</button>
+  <div id="sm-err" class="err hidden"></div>
+  <div id="sm-out" class="hidden">
+    <div class="stats" id="sm-stats"></div>
+    <pre id="sm-trace"></pre>
+  </div>
+</section>
+
+<!-- ======================= Tab 3: MITM ======================= -->
+<section id="tab-mitm">
+  <h2>Tấn công meet-in-the-middle lên 2DES</h2>
+  <p class="note">Nguyên lý: với cặp (P, C) đã biết, lập bảng X = E<sub>K1</sub>(P) cho mọi K1, rồi tính Y = D<sub>K2</sub>(C) cho mọi K2 và tìm Y trùng X. Chi phí ~2·2<sup>n</sup> thay vì 2<sup>2n</sup>.</p>
+
+  <h3>A. Bộ số nhỏ (khối 4-bit, khớp bản tính tay)</h3>
+  <button class="primary" id="m-toy">Chạy ví dụ đồ chơi</button>
+  <div id="m-toy-err" class="err hidden"></div>
+  <div id="m-toy-out" class="hidden">
+    <div class="stats" id="m-toy-stats"></div>
+    <pre id="m-toy-trace"></pre>
+  </div>
+
+  <h3>B. DES thật, khóa rút gọn</h3>
+  <p class="note">Không thể bẻ khóa 56-bit thật (bảng tra ~2<sup>56</sup> mục), nên ta chỉ để <b>n</b> bit chưa biết cho mỗi khóa, phần còn lại đã biết.</p>
+  <div class="row">
+    <div class="field"><label for="m-bits">Số bit chưa biết mỗi khóa (n)</label>
+      <input id="m-bits" type="number" min="1" max="18" value="12"></div>
+    <div class="field"><label for="m-pairs">Số cặp known-plaintext</label>
+      <input id="m-pairs" type="number" min="1" max="5" value="3"></div>
+    <div class="field"><label for="m-seed">Seed</label>
+      <input id="m-seed" type="number" value="1"></div>
+  </div>
+  <button class="primary" id="m-des">Tấn công</button>
+  <span class="note" id="m-hint">n = 16 mất khoảng vài giây đến vài chục giây.</span>
+  <div id="m-des-err" class="err hidden"></div>
+  <div id="m-des-out" class="hidden">
+    <div class="stats" id="m-des-stats"></div>
+    <table id="m-des-table"></table>
+  </div>
+</section>
+
+<!-- ======================= Tab 4: đo thời gian ======================= -->
+<section id="tab-bench">
+  <h2>Thời gian chạy theo kích thước dữ liệu</h2>
+  <div class="row">
+    <div class="field"><label for="t-alg">Hệ mã</label>
+      <select id="t-alg"><option value="des">DES</option><option value="2des">2DES</option><option value="3des" selected>3DES</option></select></div>
+    <div class="field"><label for="t-mode">Chế độ</label>
+      <select id="t-mode"><option value="cbc">CBC</option><option value="ecb">ECB</option></select></div>
+  </div>
+  <button class="primary" id="t-run">Đo</button>
+  <div id="t-err" class="err hidden"></div>
+  <div id="t-out" class="hidden"><table id="t-table"></table></div>
+</section>
+
+<!-- ======================= Tab 5: kiểm thử ======================= -->
+<section id="tab-test">
+  <h2>Đối chiếu test vector chuẩn</h2>
+  <p class="note">Mỗi dòng: mã hóa bằng DES tự cài đặt, so với bản mã chuẩn; giải mã ngược; và 3DES với K1=K2=K3 phải trùng DES đơn.</p>
+  <button class="primary" id="s-run">Chạy kiểm thử</button>
+  <div id="s-err" class="err hidden"></div>
+  <div id="s-out" class="hidden"><table id="s-table"></table></div>
+</section>
+</main>
+
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+
+async function api(path, body) {
+  const opt = body === undefined ? {} : { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) };
+  const res = await fetch(path, opt);
+  let data = {};
+  try { data = await res.json(); } catch (e) { /* bỏ qua */ }
+  if (!res.ok) throw new Error(data.error || ("Lỗi " + res.status));
+  return data;
+}
+function showErr(id, msg) { const el = $(id); el.textContent = msg; el.classList.toggle("hidden", !msg); }
+function fmtTime(s) {
+  if (s == null) return "–";
+  if (s < 1e-3) return (s * 1e6).toFixed(0) + " µs";
+  if (s < 1) return (s * 1e3).toFixed(1) + " ms";
+  if (s < 60) return s.toFixed(2) + " s";
+  const units = [["năm", 365 * 86400], ["ngày", 86400], ["giờ", 3600], ["phút", 60]];
+  for (const [u, d] of units) if (s >= d) return (s / d).toPrecision(3) + " " + u;
+  return s.toFixed(1) + " s";
+}
+function stat(value, label) { return '<div class="stat"><b>' + value + "</b><span>" + label + "</span></div>"; }
+function esc(s) { return String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c])); }
+function badge(ok, yes, no) { return '<span class="badge ' + (ok ? "ok" : "bad") + '">' + (ok ? yes : no) + "</span>"; }
+function bytesToB64(bytes) {
+  let bin = ""; const CH = 0x8000;
+  for (let i = 0; i < bytes.length; i += CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+  return btoa(bin);
+}
+function b64ToBytes(b64) { const bin = atob(b64); const out = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i); return out; }
+function download(name, b64) {
+  const url = URL.createObjectURL(new Blob([b64ToBytes(b64)], { type: "application/octet-stream" }));
+  const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click();
+  a.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function randHex16() { const a = new Uint8Array(8); crypto.getRandomValues(a); return Array.from(a, (b) => b.toString(16).padStart(2, "0")).join("").toUpperCase(); }
+
+/* ---------- Tabs ---------- */
+document.querySelectorAll("#tabs button").forEach((btn) => btn.addEventListener("click", () => {
+  document.querySelectorAll("#tabs button").forEach((b) => b.setAttribute("aria-selected", b === btn));
+  document.querySelectorAll("section").forEach((s) => s.classList.toggle("active", s.id === "tab-" + btn.dataset.tab));
+}));
+
+/* ---------- Bộ nhập khóa dùng chung ---------- */
+function keyPanel(prefix, algSel, styleSel, styleWrap, container, defaults) {
+  const labels = ["K1", "K2", "K3"];
+  container.innerHTML = labels.map((l, i) =>
+    '<div class="field grow" id="' + prefix + "-kw" + i + '"><label for="' + prefix + "-k" + i + '">' + l + ' (hex, 16 ký tự)</label>' +
+    '<input id="' + prefix + "-k" + i + '" class="mono" maxlength="16" value="' + defaults[i] + '"></div>').join("");
+  function count() {
+    const alg = algSel.value;
+    return alg === "des" ? 1 : alg === "2des" ? 2 : parseInt(styleSel.value, 10);
+  }
+  function refresh() {
+    styleWrap.classList.toggle("hidden", algSel.value !== "3des");
+    const n = count();
+    for (let i = 0; i < 3; i++) $(prefix + "-kw" + i).classList.toggle("hidden", i >= n);
+  }
+  algSel.addEventListener("change", refresh); styleSel.addEventListener("change", refresh); refresh();
+  return {
+    get() {
+      const n = count(), keys = [];
+      for (let i = 0; i < n; i++) {
+        const v = $(prefix + "-k" + i).value.trim();
+        if (!/^[0-9a-fA-F]{16}$/.test(v)) throw new Error("Khóa K" + (i + 1) + " phải gồm đúng 16 ký tự hex");
+        keys.push(v);
+      }
+      return keys;
+    },
+    randomize() { for (let i = 0; i < 3; i++) $(prefix + "-k" + i).value = randHex16(); },
+  };
+}
+const DEF_KEYS = ["133457799BBCDFF1", "0E329232EA6D0D73", "FEDCBA9876543210"];
+const cKeys = keyPanel("c", $("c-alg"), $("c-style"), $("c-style-wrap"), $("c-keys"), DEF_KEYS);
+const bKeys = keyPanel("b", $("b-alg"), $("b-style"), $("b-style-wrap"), $("b-keys"), DEF_KEYS);
+$("c-rand").addEventListener("click", () => cKeys.randomize());
+
+/* ---------- Tab 1 ---------- */
+let lastEnc = null, lastDec = null, lastName = "du_lieu";
+$("c-run").addEventListener("click", async () => {
+  showErr("c-err", ""); $("c-out").classList.add("hidden");
+  const btn = $("c-run"); btn.disabled = true;
+  try {
+    const keys = cKeys.get(), op = $("c-op").value, file = $("c-file").files[0];
+    let b64;
+    if (file) {
+      if (file.size > 2000000) throw new Error("Tệp quá lớn (tối đa 2 MB)");
+      b64 = bytesToB64(new Uint8Array(await file.arrayBuffer())); lastName = file.name.replace(/\.enc$/i, "");
+    } else {
+      const text = $("c-text").value;
+      if (op === "dec") {
+        const hex = text.replace(/\s+/g, "");
+        if (!/^([0-9a-fA-F]{2})+$/.test(hex)) throw new Error("Giải mã văn bản cần chuỗi hex hợp lệ (hoặc chọn tệp .enc)");
+        b64 = bytesToB64(Uint8Array.from(hex.match(/../g), (h) => parseInt(h, 16)));
+      } else { b64 = bytesToB64(new TextEncoder().encode(text)); }
+      lastName = "van_ban.txt";
+    }
+    const r = await api("/api/crypt", { alg: $("c-alg").value, mode: $("c-mode").value, op, keys, data: b64 });
+    let html = stat(r.size_in + " B", "Kích thước đầu vào");
+    if (r.size_cipher != null) html += stat(r.size_cipher + " B", "Kích thước bản mã") + stat(fmtTime(r.t_enc), "Thời gian mã hóa");
+    if (r.t_dec != null) html += stat(fmtTime(r.t_dec), "Thời gian giải mã");
+    if (r.match != null) html += stat(badge(r.match, "KHỚP", "LỆCH"), "Bản rõ sau giải mã so với ban đầu");
+    $("c-stats").innerHTML = html;
+    lastEnc = r.cipher_b64 || null; lastDec = r.plain_b64 || null;
+    $("c-hex").textContent = r.cipher_hex_preview ? r.cipher_hex_preview.match(/.{1,16}/g).join(" ") : "(chưa có – đang ở chế độ chỉ giải mã)";
+    $("c-plainbox").classList.toggle("hidden", !r.plain_b64);
+    if (r.plain_b64) { $("c-plain").textContent = new TextDecoder("utf-8").decode(b64ToBytes(r.plain_b64)).slice(0, 4000); }
+    $("c-dl-enc").classList.toggle("hidden", !lastEnc); $("c-dl-dec").classList.toggle("hidden", !lastDec);
+    $("c-out").classList.remove("hidden");
+  } catch (e) { showErr("c-err", e.message); } finally { btn.disabled = false; }
+});
+$("c-dl-enc").addEventListener("click", () => lastEnc && download(lastName + ".enc", lastEnc));
+$("c-dl-dec").addEventListener("click", () => lastDec && download(lastName + ".dec", lastDec));
+
+/* ---------- Tab 2 ---------- */
+$("b-run").addEventListener("click", async () => {
+  showErr("b-err", ""); $("b-out").classList.add("hidden");
+  const btn = $("b-run"); btn.disabled = true;
+  try {
+    const data = $("b-data").value.trim();
+    if (!/^[0-9a-fA-F]{16}$/.test(data)) throw new Error("Khối dữ liệu phải gồm đúng 16 ký tự hex");
+    const op = $("b-op").value;
+    const r = await api("/api/block", { alg: $("b-alg").value, op, keys: bKeys.get(), data, verbose: $("b-verbose").checked });
+    $("b-result").textContent = r.result; $("b-result-label").textContent = op === "enc" ? "Bản mã" : "Bản rõ";
+    $("b-trace").textContent = r.trace.join("\n"); $("b-trace").classList.toggle("hidden", !r.trace.length);
+    $("b-out").classList.remove("hidden");
+  } catch (e) { showErr("b-err", e.message); } finally { btn.disabled = false; }
+});
+
+/* ---------- Tab S-DES ---------- */
+(function () {
+  const labels = ["K1", "K2", "K3"], defaults = ["1010000010", "0110111001", "0011010101"];
+  $("sd-keys").innerHTML = labels.map((l, i) =>
+    '<div class="field grow" id="sd-kw' + i + '"><label for="sd-k' + i + '">' + l + ' (nhị phân, 10 bit)</label>' +
+    '<input id="sd-k' + i + '" class="mono" maxlength="10" value="' + defaults[i] + '"></div>').join("");
+  function count() { const a = $("sd-alg").value; return a === "sdes" ? 1 : a === "2sdes" ? 2 : parseInt($("sd-style").value, 10); }
+  function refresh() {
+    $("sd-style-wrap").classList.toggle("hidden", $("sd-alg").value !== "3sdes");
+    for (let i = 0; i < 3; i++) $("sd-kw" + i).classList.toggle("hidden", i >= count());
+  }
+  $("sd-alg").addEventListener("change", refresh); $("sd-style").addEventListener("change", refresh); refresh();
+
+  $("sd-run").addEventListener("click", async () => {
+    showErr("sd-err", ""); $("sd-out").classList.add("hidden");
+    const btn = $("sd-run"); btn.disabled = true;
+    try {
+      const keys = [];
+      for (let i = 0; i < count(); i++) {
+        const v = $("sd-k" + i).value.trim();
+        if (!/^[01]{10}$/.test(v)) throw new Error("Khóa K" + (i + 1) + " phải gồm đúng 10 ký tự 0/1");
+        keys.push(v);
+      }
+      const data = $("sd-data").value.trim();
+      if (!/^[01]{8}$/.test(data)) throw new Error("Khối dữ liệu phải gồm đúng 8 ký tự 0/1");
+      const op = $("sd-op").value;
+      const r = await api("/api/sblock", { alg: $("sd-alg").value, op, keys, data, verbose: $("sd-verbose").checked });
+      $("sd-result").textContent = r.result; $("sd-result-label").textContent = op === "enc" ? "Bản mã" : "Bản rõ";
+      $("sd-trace").textContent = r.trace.join("\n"); $("sd-trace").classList.toggle("hidden", !r.trace.length);
+      $("sd-out").classList.remove("hidden");
+    } catch (e) { showErr("sd-err", e.message); } finally { btn.disabled = false; }
+  });
+
+  $("sm-run").addEventListener("click", async () => {
+    showErr("sm-err", ""); $("sm-out").classList.add("hidden");
+    const btn = $("sm-run"); btn.disabled = true; btn.textContent = "Đang tấn công…";
+    try {
+      const r = await api("/api/smitm", { pairs: +$("sm-pairs").value, seed: +$("sm-seed").value, brute: $("sm-brute").checked });
+      let html = stat(badge(r.correct, "TÌM ĐÚNG KHÓA", "SAI"), "Kết quả so với khóa đã đặt") +
+        stat(esc(r.true), "Khóa thật (ẩn với kẻ tấn công)") +
+        stat(r.candidates_per_pair.join(" → "), "Ứng viên còn lại sau mỗi cặp") +
+        stat(esc(r.final.join("; ")), "Ứng viên cuối cùng") +
+        stat(r.mitm_ops.toLocaleString("vi-VN") + " vs " + r.brute_ops.toLocaleString("vi-VN"), "Số phép: MITM vs vét cạn") +
+        stat(fmtTime(r.time), "Thời gian MITM");
+      if (r.brute_measured) html += stat(fmtTime(r.brute_measured.time), "Thời gian vét cạn thật") +
+        stat(badge(r.brute_measured.same, "TRÙNG", "LỆCH"), "Vét cạn cho cùng tập ứng viên");
+      $("sm-stats").innerHTML = html;
+      $("sm-trace").textContent = "Các cặp (P, C): " + r.pairs.join(" ") + "\n\n" + r.trace.join("\n");
+      $("sm-out").classList.remove("hidden");
+    } catch (e) { showErr("sm-err", e.message); } finally { btn.disabled = false; btn.textContent = "Tấn công"; }
+  });
+})();
+
+/* ---------- Tab 3 ---------- */
+$("m-toy").addEventListener("click", async () => {
+  showErr("m-toy-err", ""); const btn = $("m-toy"); btn.disabled = true;
+  try {
+    const r = await api("/api/mitm", { kind: "toy" });
+    $("m-toy-stats").innerHTML = stat(esc(r.true_key), "Khóa thật (ẩn với kẻ tấn công)") + stat(r.pairs.map(esc).join(" "), "Các cặp (P, C)") +
+      stat(r.survivors.join(" → "), "Ứng viên còn lại sau mỗi cặp") + stat(esc(r.final.join("; ")), "Kết quả MITM") +
+      stat(r.mitm_ops + " vs " + r.brute_force_ops, "Số phép: MITM vs vét cạn");
+    $("m-toy-trace").textContent = r.trace.join("\n"); $("m-toy-out").classList.remove("hidden");
+  } catch (e) { showErr("m-toy-err", e.message); } finally { btn.disabled = false; }
+});
+$("m-des").addEventListener("click", async () => {
+  showErr("m-des-err", ""); $("m-des-out").classList.add("hidden");
+  const btn = $("m-des"); btn.disabled = true; btn.textContent = "Đang tấn công…";
+  try {
+    const r = await api("/api/mitm", { kind: "des", bits: +$("m-bits").value, pairs: +$("m-pairs").value, seed: +$("m-seed").value });
+    $("m-des-stats").innerHTML = stat(badge(r.correct, "TÌM ĐÚNG KHÓA", "SAI"), "Kết quả so với khóa đã đặt") +
+      stat(r.table_entries.toLocaleString("vi-VN"), "Số mục trong bảng tra") + stat(fmtTime(r.time_total), "Thời gian MITM") +
+      stat(fmtTime(r.brute_estimate_seconds), "Vét cạn 2DES (ước lượng)");
+    const rows = [
+      ["Số bit chưa biết mỗi khóa (n)", r.bits],
+      ["Khóa tìm thấy (v1, v2) / khóa thật", esc(JSON.stringify(r.found)) + " / " + esc(JSON.stringify([r.true]))],
+      ["Ứng viên còn lại sau từng cặp", r.candidates_per_pair.join(" → ")],
+      ["Ứng viên sai kỳ vọng sau 1 cặp (2^2n / 2^64)", r.false_pos_one_pair.toExponential(2)],
+      ["Số phép mã/giải mã: MITM ≈ 2·2^n", r.mitm_ops.toLocaleString("vi-VN")],
+      ["Số cặp khóa vét cạn 2^2n", r.brute_ops.toLocaleString("vi-VN")],
+      ["Thời gian lập bảng + tra bảng", fmtTime(r.time_table) + " + " + fmtTime(r.time_lookup)],
+    ];
+    if (r.brute_measured) rows.push(["Vét cạn thật (đo được)", r.brute_measured.trials.toLocaleString("vi-VN") + " lần thử, " + fmtTime(r.brute_measured.time)]);
+    const f = r.full_scale;
+    rows.push(["— Với 2DES đầy đủ (56-bit mỗi khóa) —", ""],
+      ["Phép tính MITM / mục trong bảng", f.mitm_ops + " / " + f.table_entries],
+      ["Dung lượng bảng", f.table_pb_values_only.toFixed(0) + " PB (chỉ lưu X) ≈ " + f.table_eb_with_key.toFixed(2) + " EB (kèm khóa)"],
+      ["Ứng viên sai sau 1 cặp", f.false_positives_one_pair + " → bắt buộc ≥ 2 cặp known-plaintext"]);
+    $("m-des-table").innerHTML = rows.map((x) => "<tr><th>" + x[0] + "</th><td>" + x[1] + "</td></tr>").join("");
+    $("m-des-out").classList.remove("hidden");
+  } catch (e) { showErr("m-des-err", e.message); } finally { btn.disabled = false; btn.textContent = "Tấn công"; }
+});
+
+/* ---------- Tab 4 ---------- */
+$("t-run").addEventListener("click", async () => {
+  showErr("t-err", ""); $("t-out").classList.add("hidden");
+  const btn = $("t-run"); btn.disabled = true; btn.textContent = "Đang đo…";
+  try {
+    const r = await api("/api/benchmark", { alg: $("t-alg").value, mode: $("t-mode").value, sizes: [1024, 4096, 16384, 65536, 262144] });
+    const max = Math.max(...r.rows.map((x) => x.t_enc));
+    $("t-table").innerHTML = "<tr><th>Kích thước</th><th>Mã hóa</th><th>Giải mã</th><th>Tốc độ mã hóa</th><th>Đúng</th><th style='width:30%'>Thời gian mã hóa</th></tr>" +
+      r.rows.map((x) => "<tr><td>" + (x.size >= 1024 ? (x.size / 1024) + " KB" : x.size + " B") + "</td><td>" + fmtTime(x.t_enc) + "</td><td>" + fmtTime(x.t_dec) +
+        "</td><td>" + (x.kb_per_s ? x.kb_per_s.toFixed(0) + " KB/s" : "–") + "</td><td>" + badge(x.ok, "KHỚP", "LỆCH") +
+        '</td><td><div class="bar" style="width:' + Math.max(1, 100 * x.t_enc / max) + '%"></div></td></tr>').join("");
+    $("t-out").classList.remove("hidden");
+  } catch (e) { showErr("t-err", e.message); } finally { btn.disabled = false; btn.textContent = "Đo"; }
+});
+
+/* ---------- Tab 5 ---------- */
+$("s-run").addEventListener("click", async () => {
+  showErr("s-err", ""); $("s-out").classList.add("hidden");
+  try {
+    const r = await api("/api/selftest");
+    $("s-table").innerHTML = "<tr><th>Ca</th><th>Khóa</th><th>Bản rõ</th><th>Bản mã chuẩn</th><th>Kết quả nhóm</th><th>Mã hóa</th><th>Giải mã ngược</th><th>3DES (K1=K2=K3)</th></tr>" +
+      r.rows.map((x) => "<tr><td>" + esc(x.note) + '</td><td class="mono">' + x.key + '</td><td class="mono">' + x.plain + '</td><td class="mono">' + x.expected +
+        '</td><td class="mono">' + x.got + "</td><td>" + badge(x.ok, "KHỚP", "LỆCH") + "</td><td>" + badge(x.roundtrip, "KHỚP", "LỆCH") +
+        "</td><td>" + badge(x.des3_same, "KHỚP", "LỆCH") + "</td></tr>").join("");
+    $("s-out").classList.remove("hidden");
+  } catch (e) { showErr("s-err", e.message); }
+});
+</script>
+</body>
+</html>

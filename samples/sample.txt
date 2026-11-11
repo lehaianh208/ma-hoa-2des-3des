@@ -1,0 +1,11 @@
+BAO CAO AN TOAN BAO MAT THONG TIN - DE TAI DOUBLE DES VA TRIPLE DES
+
+Tep van ban mau dung de demo ma hoa va giai ma.
+Co tieng Viet co dau de kiem tra byte UTF-8: Mật mã học, tấn công gặp nhau ở giữa (meet-in-the-middle).
+
+2DES: C = E_K2(E_K1(P)). Khoa danh nghia 112-bit nhung MITM chi ton khoang 2^57 phep tinh.
+3DES: C = E_K3(D_K2(E_K1(P))). Khoa hieu dung ~112-bit (3 khoa) hoac ~80-bit (2 khoa).
+
+Dong lap lai de quan sat ECB (cac khoi giong nhau cho ban ma giong nhau):
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
