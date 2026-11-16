@@ -9,7 +9,9 @@ Phan thuat toan nam hoan toan o core/; file nay chi lam giao dien HTTP/JSON.
 
 API (JSON):
     POST /api/block      ma/giai ma 1 khoi 64-bit, co the tra ve trace tung buoc
-    POST /api/sblock     S-DES / 2S-DES / 3S-DES (phien ban thu nho): khoi 8-bit, khoa 10-bit, co trace
+    POST /api/tblock     TinyDES / 2TinyDES / 3TinyDES (ban thu nho cua lop): khoi 8-bit, khoa 8-bit, co trace
+    POST /api/tmitm      MITM len 2TinyDES voi khoa day du 8 bit (co the chay them vet can)
+    POST /api/sblock     S-DES / 2S-DES / 3S-DES (ban thu nho bo sung): khoi 8-bit, khoa 10-bit, co trace
     POST /api/smitm      MITM len 2S-DES voi khoa day du 10 bit (co the chay them vet can)
     POST /api/crypt      ma/giai ma van ban hoac tep (base64), ECB/CBC, do thoi gian
     POST /api/mitm       MITM do choi 4-bit hoac MITM len DES khoa rut gon
@@ -30,6 +32,11 @@ from core.des import hex_to_int, int_to_hex
 from core.des_multi import crypt_block, encrypt_3des_1key
 from core.modes import encrypt_bytes, decrypt_bytes
 from core.mitm_toy import mitm_toy, double_encrypt
+from core.tinydes import bin_to_int as tbin_to_int, int_to_bin as tint_to_bin
+from core.tinydes_multi import crypt_block as tcrypt_block
+from core.mitm_tinydes import (
+    mitm_2tinydes, brute_force_2tinydes, double_encrypt as tinydes_double_encrypt,
+)
 from core.sdes import bin_to_int, int_to_bin
 from core.sdes_multi import crypt_block as scrypt_block
 from core.mitm_sdes import mitm_2sdes, brute_force_2sdes, double_encrypt as sdes_double_encrypt
@@ -183,6 +190,55 @@ def api_mitm(req):
     return out
 
 
+def api_tblock(req):
+    """TinyDES / 2TinyDES / 3TinyDES (ban thu nho cua lop): ma/giai ma 1 khoi 8-bit bang khoa 8-bit (chuoi nhi phan)."""
+    alg, op = req.get("alg", "tinydes"), req.get("op", "enc")
+    if op not in ("enc", "dec"):
+        raise ApiError("op phai la enc hoac dec")
+    try:
+        block = tbin_to_int(req.get("data", ""), 8)
+        keys = [tbin_to_int(k, 8) for k in req.get("keys", [])]
+    except ValueError as e:
+        raise ApiError(str(e))
+    trace = []
+    try:
+        out = tcrypt_block(alg, op, keys, block, trace.append if req.get("verbose") else None)
+    except ValueError as e:
+        raise ApiError(str(e))
+    return {"result": tint_to_bin(out, 8), "trace": trace}
+
+
+def api_tmitm(req):
+    """MITM len 2TinyDES, khoa day du 8 bit moi ben (khong gian 2^16)."""
+    import random
+    try:
+        seed = int(req.get("seed", 1))
+        n_pairs = int(req.get("pairs", 12))
+    except (TypeError, ValueError):
+        raise ApiError("Tham so khong hop le")
+    if not 1 <= n_pairs <= 64:
+        raise ApiError("pairs phai trong khoang 1..64")
+    rnd = random.Random(seed)
+    k1, k2 = rnd.randrange(1 << 8), rnd.randrange(1 << 8)
+    pairs = [(p, tinydes_double_encrypt(p, k1, k2)) for p in rnd.sample(range(256), n_pairs)]
+    lines = []
+    r = mitm_2tinydes(pairs, trace=lines.append)
+    out = {
+        "true": "K1 = {:08b}, K2 = {:08b}".format(k1, k2),
+        "pairs": ["({:08b},{:08b})".format(p, c) for p, c in pairs],
+        "trace": lines,
+        "candidates_per_pair": r["candidates_per_pair"],
+        "final": ["K1 = {:08b}, K2 = {:08b}".format(a, b) for a, b in r["final"]],
+        "correct": (k1, k2) in r["final"],
+        "mitm_ops": r["mitm_ops"], "brute_ops": r["brute_force_ops"], "time": r["time"],
+    }
+    if req.get("brute"):
+        b = brute_force_2tinydes(pairs)
+        out["brute_measured"] = {"trials": b["trials"], "time": b["time"], "candidates": len(b["final"]),
+                                 "same": sorted(b["final"]) == sorted(r["final"])}
+    return out
+
+
 def api_sblock(req):
     """S-DES / 2S-DES / 3S-DES: ma/giai ma 1 khoi 8-bit bang khoa 10-bit (chuoi nhi phan)."""
     alg, op = req.get("alg", "sdes"), req.get("op", "enc")
@@ -273,6 +329,8 @@ def api_selftest(_req=None):
 
 ROUTES = {
     "/api/block": api_block,
+    "/api/tblock": api_tblock,
+    "/api/tmitm": api_tmitm,
     "/api/sblock": api_sblock,
     "/api/smitm": api_smitm,
     "/api/crypt": api_crypt,
