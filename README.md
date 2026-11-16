@@ -224,9 +224,9 @@ Với cặp known-plaintext `(P, C)` của 2DES: lập bảng `X = E_K1(P)` cho 
   | Phần                                                                                                                                           | Ai | Tình trạng                                                                                                                                           |
   |------------------------------------------------------------------------------------------------------------------------------------------------|---|------------------------------------------------------------------------------------------------------------------------------------------------------|
   | `core/tables.py`, `core/des.py`, `core/des_multi.py`, `core/sdes.py`, `core/tinydes.py`                                                        | H.Anh | Tự gõ, tự chạy và đối chiếu kết quả                                                                                                                  |
-  | `core/modes.py`, `core/mitm_toy.py`, `core/mitm_des.py`, `core/mitm_sdes.py`, `filecrypt.py`, `mitm_demo.py`, `tests/test_modes.py`, `tests/test_mitm.py`, `tests/test_sdes.py` | Ngọc | Mã do AI viết, Ngọc đọc, chạy và kiểm thử lại                                                             |
-  | `cli.py`, `sdes_cli.py`, `core/ciphers.py`, `core/des_fast.py`, `app/`, `tests/test_des.py`, `demo.py`, `core/tinydes_multi.py`, `core/mitm_tinydes.py`, `tinydes_cli.py`                                       | Cả nhóm | Do AI hướng dẫn, nhóm viết, chạy và kiểm thử lại                                                                                                     |
- | Báo cáo, sơ đồ khối, bài tính tay trên giấy, phân tích an toàn, so sánh AES, slide, `docs/doi_chieu_tinh_tay.md`,`tests/test_tinydes.p`         | Trang, Hiếu | Hai bạn tự viết; bài tính tay được đối chiếu với `docs/doi_chieu_tinh_tay.md`                                                                                          |
+  | `core/modes.py`, `core/mitm_toy.py`, `core/mitm_des.py`, `core/mitm_sdes.py`, `filecrypt.py`, `mitm_demo.py`, `tests/test_modes.py`, `tests/test_mitm.py`,  | Ngọc | Mã do AI viết, Ngọc đọc, chạy và kiểm thử lại                                                             |
+  | `cli.py`, `sdes_cli.py`, `core/ciphers.py`, `core/des_fast.py`, `app/`, `demo.py`, `core/tinydes_multi.py`, `core/mitm_tinydes.py`, `tinydes_cli.py`                                       | Cả nhóm | Do AI hướng dẫn, nhóm viết, chạy và kiểm thử lại                                                                                                     |
+  | Báo cáo, sơ đồ khối, bài tính tay trên giấy, phân tích an toàn, so sánh AES, slide, `docs/doi_chieu_tinh_tay.md`,`tests/test_tinydes.p`,`tests/test_sdes.py`,`tests/test_des.py`,         | Trang, Hiếu | Hai bạn tự viết; bài tính tay được đối chiếu với `docs/doi_chieu_tinh_tay_tinydes.md`                                                                                          |
 
 ## 8. Thành viên và phân công
 
@@ -236,6 +236,6 @@ Với cặp known-plaintext `(P, C)` của 2DES: lập bảng `X = E_K1(P)` cho 
 | H. Anh | Lõi DES / 2DES / 3DES và phiên bản thu nhỏ TinyDES và S-DES, chế độ `--verbose`, chạy và trình diễn giao diện web; GITHUB; thuyết trình và video demo dự phòng                                                                                              |
 | Ngọc | Chế độ ECB/CBC, tấn công MITM, bộ kiểm thử và bảng đối chiếu thư viện, README, so sánh kết quả tay với máy; chủ trì họp online (test case)                                                                                                                  |
 
-Đối chiếu chéo: Ngọc chạy test cho phần lõi của H.Anh; H.Anh xem lại MITM của Ngọc; Trang hoặc Hiếu đối chiếu `--verbose` và `docs/doi_chieu_tinh_tay*.md` với bài tính tay.
+Đối chiếu chéo: Ngọc chạy test cho phần lõi của H.Anh; H.Anh xem lại MITM của Ngọc; Trang hoặc Hiếu đối chiếu `--verbose` và `docs/doi_chieu_tinh_tay_tinydes.md` với bài tính tay.
 
 *(Tỉ lệ đóng góp của từng người có xác nhận của cả nhóm nằm trong báo cáo.)*
