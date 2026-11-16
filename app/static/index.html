@@ -77,7 +77,8 @@ td.mono, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, mon
 <nav role="tablist" id="tabs">
   <button role="tab" data-tab="crypt" aria-selected="true">Mã hóa / giải mã</button>
   <button role="tab" data-tab="block" aria-selected="false">Từng bước (1 khối)</button>
-  <button role="tab" data-tab="sdes" aria-selected="false">S-DES (bản thu nhỏ)</button>
+  <button role="tab" data-tab="tinydes" aria-selected="false">TinyDES (bản thu nhỏ của lớp)</button>
+  <button role="tab" data-tab="sdes" aria-selected="false">S-DES (bổ sung)</button>
   <button role="tab" data-tab="mitm" aria-selected="false">Tấn công MITM</button>
   <button role="tab" data-tab="bench" aria-selected="false">Đo thời gian</button>
   <button role="tab" data-tab="test" aria-selected="false">Kiểm thử</button>
@@ -149,9 +150,51 @@ td.mono, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, mon
   </div>
 </section>
 
-<!-- ======================= Tab: S-DES (bản thu nhỏ) ======================= -->
+<!-- ======================= Tab: TinyDES (bản thu nhỏ của lớp) ======================= -->
+<section id="tab-tinydes">
+  <h2>TinyDES, 2TinyDES, 3TinyDES: phiên bản thu nhỏ của DES mà lớp đã học</h2>
+  <p class="note">Mạng Feistel 3 vòng, khối 8 bit, khóa 8 bit, khóa con 6 bit (bài giảng chương 2). Mặc định là ví dụ trên lớp: khóa 10011010, bản rõ 01011100 → bản mã 10010010 (92). Bài 9: khóa 10111011, bản rõ 01010011 → 10001110 (8E).</p>
+  <div class="row">
+    <div class="field"><label for="td-alg">Hệ mã</label>
+      <select id="td-alg"><option value="tinydes" selected>TinyDES</option><option value="2tinydes">2TinyDES</option><option value="3tinydes">3TinyDES</option></select></div>
+    <div class="field"><label for="td-op">Thao tác</label>
+      <select id="td-op"><option value="enc">Mã hóa</option><option value="dec">Giải mã</option></select></div>
+    <div class="field" id="td-style-wrap"><label for="td-style">Kiểu khóa 3TinyDES</label>
+      <select id="td-style"><option value="3">3 khóa</option><option value="2">2 khóa</option><option value="1">1 khóa</option></select></div>
+  </div>
+  <div class="row" id="td-keys"></div>
+  <div class="row">
+    <div class="field grow"><label for="td-data">Khối dữ liệu (nhị phân, 8 bit)</label>
+      <input id="td-data" class="mono" value="01011100" maxlength="8"></div>
+    <div class="field"><label>&nbsp;</label><span class="inline"><input type="checkbox" id="td-verbose" checked><label for="td-verbose" style="color:var(--ink)">In các bước trung gian</label></span></div>
+  </div>
+  <button class="primary" id="td-run">Thực hiện</button>
+  <div id="td-err" class="err hidden"></div>
+  <div id="td-out" class="hidden">
+    <div class="stats"><div class="stat"><b class="mono" id="td-result"></b><span id="td-result-label"></span></div></div>
+    <pre id="td-trace"></pre>
+  </div>
+
+  <h3>Tấn công MITM lên 2TinyDES với khóa đầy đủ (2<sup>16</sup> cặp khóa)</h3>
+  <p class="note">Khác với 2DES thật, 2TinyDES có khóa chỉ 8 bit nên MITM chạy được trên khóa ĐẦY ĐỦ, không cần rút gọn: 512 phép so với 131 072 phép của vét cạn. Vì khối chỉ 8 bit nên cần vài cặp known-plaintext để loại ứng viên sai.</p>
+  <div class="row">
+    <div class="field"><label for="tm-pairs">Số cặp known-plaintext</label>
+      <input id="tm-pairs" type="number" min="1" max="64" value="12"></div>
+    <div class="field"><label for="tm-seed">Seed</label>
+      <input id="tm-seed" type="number" value="1"></div>
+    <div class="field"><label>&nbsp;</label><span class="inline"><input type="checkbox" id="tm-brute"><label for="tm-brute" style="color:var(--ink)">Chạy cả vét cạn (chưa đến 1 giây)</label></span></div>
+  </div>
+  <button class="primary" id="tm-run">Tấn công</button>
+  <div id="tm-err" class="err hidden"></div>
+  <div id="tm-out" class="hidden">
+    <div class="stats" id="tm-stats"></div>
+    <pre id="tm-trace"></pre>
+  </div>
+</section>
+
+<!-- ======================= Tab: S-DES (bản thu nhỏ bổ sung) ======================= -->
 <section id="tab-sdes">
-  <h2>S-DES, 2S-DES, 3S-DES: phiên bản thu nhỏ của DES</h2>
+  <h2>S-DES, 2S-DES, 3S-DES: phiên bản thu nhỏ bổ sung (giáo trình Stallings)</h2>
   <p class="note">Khối 8 bit, khóa 10 bit, 2 vòng. Cấu trúc giống DES nhưng đủ nhỏ để tính tay từng bước. Mặc định là ví dụ trong giáo trình: khóa 1010000010, bản rõ 01110010 → bản mã 01110111.</p>
   <div class="row">
     <div class="field"><label for="sd-alg">Hệ mã</label>
@@ -427,6 +470,59 @@ $("b-run").addEventListener("click", async () => {
       $("sm-trace").textContent = "Các cặp (P, C): " + r.pairs.join(" ") + "\n\n" + r.trace.join("\n");
       $("sm-out").classList.remove("hidden");
     } catch (e) { showErr("sm-err", e.message); } finally { btn.disabled = false; btn.textContent = "Tấn công"; }
+  });
+})();
+
+/* ---------- Tab TinyDES ---------- */
+(function () {
+  const labels = ["K1", "K2", "K3"], defaults = ["10011010", "10111011", "01100101"];
+  $("td-keys").innerHTML = labels.map((l, i) =>
+    '<div class="field grow" id="td-kw' + i + '"><label for="td-k' + i + '">' + l + ' (nhị phân, 8 bit)</label>' +
+    '<input id="td-k' + i + '" class="mono" maxlength="8" value="' + defaults[i] + '"></div>').join("");
+  function count() { const a = $("td-alg").value; return a === "tinydes" ? 1 : a === "2tinydes" ? 2 : parseInt($("td-style").value, 10); }
+  function refresh() {
+    $("td-style-wrap").classList.toggle("hidden", $("td-alg").value !== "3tinydes");
+    for (let i = 0; i < 3; i++) $("td-kw" + i).classList.toggle("hidden", i >= count());
+  }
+  $("td-alg").addEventListener("change", refresh); $("td-style").addEventListener("change", refresh); refresh();
+
+  $("td-run").addEventListener("click", async () => {
+    showErr("td-err", ""); $("td-out").classList.add("hidden");
+    const btn = $("td-run"); btn.disabled = true;
+    try {
+      const keys = [];
+      for (let i = 0; i < count(); i++) {
+        const v = $("td-k" + i).value.trim();
+        if (!/^[01]{8}$/.test(v)) throw new Error("Khóa K" + (i + 1) + " phải gồm đúng 8 ký tự 0/1");
+        keys.push(v);
+      }
+      const data = $("td-data").value.trim();
+      if (!/^[01]{8}$/.test(data)) throw new Error("Khối dữ liệu phải gồm đúng 8 ký tự 0/1");
+      const op = $("td-op").value;
+      const r = await api("/api/tblock", { alg: $("td-alg").value, op, keys, data, verbose: $("td-verbose").checked });
+      $("td-result").textContent = r.result; $("td-result-label").textContent = op === "enc" ? "Bản mã" : "Bản rõ";
+      $("td-trace").textContent = r.trace.join("\n"); $("td-trace").classList.toggle("hidden", !r.trace.length);
+      $("td-out").classList.remove("hidden");
+    } catch (e) { showErr("td-err", e.message); } finally { btn.disabled = false; }
+  });
+
+  $("tm-run").addEventListener("click", async () => {
+    showErr("tm-err", ""); $("tm-out").classList.add("hidden");
+    const btn = $("tm-run"); btn.disabled = true; btn.textContent = "Đang tấn công…";
+    try {
+      const r = await api("/api/tmitm", { pairs: +$("tm-pairs").value, seed: +$("tm-seed").value, brute: $("tm-brute").checked });
+      let html = stat(badge(r.correct, "TÌM ĐÚNG KHÓA", "SAI"), "Kết quả so với khóa đã đặt") +
+        stat(esc(r.true), "Khóa thật (ẩn với kẻ tấn công)") +
+        stat(r.candidates_per_pair.join(" → "), "Ứng viên còn lại sau mỗi cặp") +
+        stat(esc(r.final.join("; ")), "Ứng viên cuối cùng") +
+        stat(r.mitm_ops.toLocaleString("vi-VN") + " vs " + r.brute_ops.toLocaleString("vi-VN"), "Số phép: MITM vs vét cạn") +
+        stat(fmtTime(r.time), "Thời gian MITM");
+      if (r.brute_measured) html += stat(fmtTime(r.brute_measured.time), "Thời gian vét cạn thật") +
+        stat(badge(r.brute_measured.same, "TRÙNG", "LỆCH"), "Vét cạn cho cùng tập ứng viên");
+      $("tm-stats").innerHTML = html;
+      $("tm-trace").textContent = "Các cặp (P, C): " + r.pairs.join(" ") + "\n\n" + r.trace.join("\n");
+      $("tm-out").classList.remove("hidden");
+    } catch (e) { showErr("tm-err", e.message); } finally { btn.disabled = false; btn.textContent = "Tấn công"; }
   });
 })();
 
