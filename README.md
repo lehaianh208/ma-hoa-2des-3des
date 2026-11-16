@@ -55,7 +55,7 @@ Các tab:
 
 ### 2.2 Dòng lệnh
 
-**Mã hóa một khối 64-bit** (khóa và khối là hex 16 ký tự):
+Mã hóa một khối 64-bit (khóa và khối là hex 16 ký tự):
 
 ```bash
 python cli.py enc --alg des  --keys 133457799BBCDFF1 --data 0123456789ABCDEF          # -> 85E813540F0AB405
@@ -149,7 +149,7 @@ des_project/
 ├── tests/                   # test_des.py, test_modes.py, test_mitm.py, test_tinydes.py, test_sdes.py
 ├── samples/sample.txt       # tệp văn bản mẫu (có tiếng Việt UTF-8) để demo
 ├── docs/doi_chieu_tinh_tay.md        # cột "máy" của ví dụ DES kinh điển (do chương trình sinh ra)
-├── demo.bat                 # chạy lần lượt các bước demo trên Windows (có pause giữa các bước)
+├── demo.py                  # chạy lần lượt các bước demo (dừng chờ Enter giữa các bước): py demo.py
 ├── docs/kich_ban_demo.md    # kịch bản demo 5–7 phút
 ├── docs/doi_chieu_tinh_tay_tinydes.md   # ví dụ tính tay trên TinyDES (ví dụ lớp + Bài 9), khớp chương trình
 └── docs/doi_chieu_tinh_tay_sdes.md   # ví dụ tính tay đầy đủ trên S-DES, khớp chương trình
@@ -161,18 +161,18 @@ trên hàng nghìn ca ngẫu nhiên. Nhờ đó mã hóa tệp và MITM nhanh g�
 
 ## 4. Đối chiếu với yêu cầu của giảng viên
 
-| Yêu cầu | Đáp ứng |
-|---|---|
-| Tự cài đặt từ đầu, không dùng thư viện mật mã cho phần lõi | `core/` không gọi thư viện mật mã; thư viện chỉ xuất hiện trong `tests/` (xem mục 7 về phần có AI hỗ trợ) |
-| Có cả mã hóa và giải mã, giải mã khôi phục đúng bản rõ | Mọi hệ mã và chế độ đều có hai chiều, được test round-trip |
-| Hai phiên bản: bản thu nhỏ tái hiện ví dụ học trên lớp | TinyDES (ví dụ trên lớp: `5C` + khóa `9A` → `92`; Bài 9: `53` + `BB` → `8E`), `docs/doi_chieu_tinh_tay_tinydes.md`; thêm S-DES của giáo trình (`1010000010`, `01110010` → `01110111`) |
+| Yêu cầu | Đáp ứng                                                                                                                                                                                  |
+|---|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Tự cài đặt từ đầu, không dùng thư viện mật mã cho phần lõi | `core/` không gọi thư viện mật mã; thư viện chỉ xuất hiện trong `tests/` (xem mục 7 về phần có AI hỗ trợ)                                                                                |
+| Có cả mã hóa và giải mã, giải mã khôi phục đúng bản rõ | Mọi hệ mã và chế độ đều có hai chiều, được test round-trip                                                                                                                               |
+| Hai phiên bản: bản thu nhỏ tái hiện ví dụ học trên lớp | TinyDES (ví dụ trên lớp: `5C` + khóa `9A` → `92`; Bài 9: `53` + `BB` → `8E`), `docs/doi_chieu_tinh_tay_tinydes.md`; thêm S-DES của giáo trình (`1010000010`, `01110010` → `01110111`)    |
 | Ít nhất 3 ca kiểm thử tự viết + đối chiếu test vector chuẩn / thư viện, in kết quả đối chiếu | 86 ca; ví dụ lớp và Bài 9 của TinyDES; vector chuẩn DES và S-DES; `tests/test_des.py --compare` in bảng KHỚP/LỆCH với thư viện; S-DES đối chiếu chéo với một cài đặt viết theo cách khác |
-| Mã nguồn chia module, có chú thích, tách thuật toán khỏi giao diện | `core/` (thuật toán) tách khỏi `app/`, `cli.py`, `filecrypt.py`, `mitm_demo.py` |
-| Nhập bản rõ + khóa, hiện bản mã, giải mã ngược lại đúng | Tab “Mã hóa / giải mã”; `filecrypt.py demo` |
-| In các bước trung gian (khóa con, kết quả từng vòng…) | `--verbose` trong `cli.py`, `tinydes_cli.py` và `sdes_cli.py`; tab “Từng bước” và tab “S-DES”; `docs/doi_chieu_tinh_tay*.md` |
-| Demo trên dữ liệu thật: mã hóa tệp rồi giải mã lại | `samples/sample.txt`, tải tệp bất kỳ ≤ 2 MB trên web |
-| (Khuyến khích) giao diện web, đo thời gian theo kích thước dữ liệu | Giao diện web, tab “Đo thời gian” |
-| (Khuyến khích) minh họa một tình huống tấn công | MITM lên 2DES (bộ số nhỏ + DES khóa rút gọn) và lên 2TinyDES, 2S-DES với khóa đầy đủ |
+| Mã nguồn chia module, có chú thích, tách thuật toán khỏi giao diện | `core/` (thuật toán) tách khỏi `app/`, `cli.py`, `filecrypt.py`, `mitm_demo.py`                                                                                                          |
+| Nhập bản rõ + khóa, hiện bản mã, giải mã ngược lại đúng | Tab “Mã hóa / giải mã”; `filecrypt.py demo`                                                                                                                                              |
+| In các bước trung gian (khóa con, kết quả từng vòng…) | `--verbose` trong `cli.py`, `tinydes_cli.py` và `sdes_cli.py`; tab “Từng bước”, tab “TinyDES” (bản thu nhỏ của lớp) và tab “S-DES”; `docs/doi_chieu_tinh_tay*.md`                        |
+| Demo trên dữ liệu thật: mã hóa tệp rồi giải mã lại | `samples/sample.txt`, tải tệp bất kỳ ≤ 2 MB trên web                                                                                                                                     |
+| (Khuyến khích) giao diện web, đo thời gian theo kích thước dữ liệu | Giao diện web, tab “Đo thời gian”                                                                                                                                                        |
+| (Khuyến khích) minh họa một tình huống tấn công | MITM lên 2DES (bộ số nhỏ + DES khóa rút gọn) và lên 2TinyDES, 2S-DES với khóa đầy đủ                                                                                                     |
 
 ## 5. Quy ước và lưu ý kỹ thuật
 
@@ -218,21 +218,24 @@ Với cặp known-plaintext `(P, C)` của 2DES: lập bảng `X = E_K1(P)` cho 
 - Đối chiếu kết quả: OpenSSL, `cryptography`, PyCryptodome (chỉ trong `tests/`).
 - Bài giảng và file bài tập ATBMTT của lớp, chương 2 (mục 3.2 Mã khối: TinyDES, DES, Double DES, Triple DES; Bài 9 TinyDES).
 - S-DES: E. Schaefer, “A Simplified Data Encryption Standard Algorithm”, *Cryptologia*, 1996; W. Stallings, *Cryptography and Network Security* (phụ lục S-DES).
--  Phần tự viết và phần có AI hỗ trợ: mã nguồn được viết với sự hỗ trợ của các trợ lý AI (Claude/Anthropic, ChatGPT, Gemini).
+- **Phần tự viết và phần có AI hỗ trợ**: mã nguồn được viết với sự hỗ trợ của các trợ lý AI (Claude/Anthropic, ChatGPT, Gemini).
   Các bảng hằng số lấy từ FIPS 46-3 và tài liệu S-DES nêu trên. Phân định cụ thể:
 
-| Phần                                                                                                                                                                                   | Ai | Tình trạng                                                 |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|------------------------------------------------------------|
-| `core/tables.py`, `core/des.py`, `core/sdes.py`, `cli.py`, `sdes_cli.py` , `core/tinydes.py`                                                                                           | H.Anh | Tự gõ, tự chạy và đối chiếu kết quả                        |
-| `core/modes.py`, `core/mitm_toy.py`, `core/mitm_tinydes.py`, `core/mitm_tinydes.py`, `filecrypt.py`, `mitm_demo.py`, `tests/test_modes.py`, `tests/test_mitm.py`, `tests/test_sdes.py` | Ngọc | Mã do AI hỗ trợ để tự viết, chạy và kiểm thử lại |
-| Báo cáo, sơ đồ khối, bài tính tay trên giấy, phân tích an toàn, so sánh AES, slide, `tests/test_tinydes.py` và `docs/doi_chieu_tinh_tay_tinydes.md`                                                                                                   | Trang, Hiếu | Hai bạn tự viết                                            |
-- Các phần còn lại do AI hỗ trợ , nhóm tự chạy , kiểm tra
-## 8. Thành viên
+  | Phần                                                                                                                                           | Ai | Tình trạng                                                                                                                                           |
+  |------------------------------------------------------------------------------------------------------------------------------------------------|---|------------------------------------------------------------------------------------------------------------------------------------------------------|
+  | `core/tables.py`, `core/des.py`, `core/des_multi.py`, `core/sdes.py`, `core/tinydes.py`                                                        | H.Anh | Tự gõ, tự chạy và đối chiếu kết quả                                                                                                                  |
+  | `core/modes.py`, `core/mitm_toy.py`, `core/mitm_des.py`, `core/mitm_sdes.py`, `filecrypt.py`, `mitm_demo.py`, `tests/test_modes.py`, `tests/test_mitm.py`, `tests/test_sdes.py` | Ngọc | Mã do AI viết, Ngọc đọc, chạy và kiểm thử lại                                                             |
+  | `cli.py`, `sdes_cli.py`, `core/ciphers.py`, `core/des_fast.py`, `app/`, `tests/test_des.py`, `demo.py`, `core/tinydes_multi.py`, `core/mitm_tinydes.py`, `tinydes_cli.py`                                       | Cả nhóm | Do AI hướng dẫn, nhóm viết, chạy và kiểm thử lại                                                                                                     |
+ | Báo cáo, sơ đồ khối, bài tính tay trên giấy, phân tích an toàn, so sánh AES, slide, `docs/doi_chieu_tinh_tay.md`,`tests/test_tinydes.p`         | Trang, Hiếu | Hai bạn tự viết; bài tính tay được đối chiếu với `docs/doi_chieu_tinh_tay.md`                                                                                          |
 
-| Thành viên | Phần phụ trách |
-|---|---|
-| Trang, Hiếu | Tìm hiểu hệ mã: bối cảnh, thuật toán, sơ đồ khối, tính tay, phân tích an toàn, so sánh AES |
-| H. Anh | Lõi DES / 2DES / 3DES, phiên bản thu nhỏ TinyDES và S-DES, `--verbose`, giao diện web chính |
-| Ngọc | Chế độ ECB/CBC, MITM, bộ kiểm thử, README, so sánh tay và máy |
+## 8. Thành viên và phân công
 
-*(Bảng phân công chi tiết và tỉ lệ đóng góp có xác nhận của cả nhóm nằm trong báo cáo.)*
+| Thành viên | Phần phụ trách                                                                                                                                                                                                                                              |
+|---|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Trang, Hiếu | Tìm hiểu hệ mã: bối cảnh ra đời, mô tả thuật toán và sơ đồ khối, ví dụ tính tay (TinyDES theo ví dụ trên lớp và Bài 9, DES, ghép 2DES/3DES, MITM bộ số nhỏ), phân tích an toàn, so sánh AES; **báo cáo** và **slide** (hai bạn tự chia, mỗi người một việc) |
+| H. Anh | Lõi DES / 2DES / 3DES và phiên bản thu nhỏ TinyDES và S-DES, chế độ `--verbose`, chạy và trình diễn giao diện web; GITHUB; thuyết trình và video demo dự phòng                                                                                              |
+| Ngọc | Chế độ ECB/CBC, tấn công MITM, bộ kiểm thử và bảng đối chiếu thư viện, README, so sánh kết quả tay với máy; chủ trì họp online (test case)                                                                                                                  |
+
+Đối chiếu chéo: Ngọc chạy test cho phần lõi của H.Anh; H.Anh xem lại MITM của Ngọc; Trang hoặc Hiếu đối chiếu `--verbose` và `docs/doi_chieu_tinh_tay*.md` với bài tính tay.
+
+*(Tỉ lệ đóng góp của từng người có xác nhận của cả nhóm nằm trong báo cáo.)*
