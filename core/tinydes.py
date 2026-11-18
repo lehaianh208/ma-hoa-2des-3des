@@ -1,35 +1,4 @@
-"""
-tinydes.py - TinyDES: hệ mã Feistel thu nhỏ của DES theo bài giảng ATBMTT (Chương 2, mục 3.2 Mã khối).
 
-Đây là PHIÊN BẢN THU NHỎ MÀ LỚP ĐÃ HỌC. Chương trình tái hiện đúng ví dụ trên lớp:
-    P = 01011100 (5C), K = 10011010 (9A)  ->  C = 10010010 (92)
-và đáp án Bài 9 trong file bài tập:
-    P = 01010011 (53), K = 10111011 (BB)  ->  K1 = 111110, K2 = 111011, K3 = 001111, C = 10001110 (8E)
-
-Tính chất (theo bài giảng):
-    - Mã Feistel 3 vòng; khối 8 bit (L, R mỗi nửa 4 bit); khóa 8 bit; khóa con mỗi vòng 6 bit.
-    - KHÔNG có hoán vị đầu/cuối; bản mã là C = L3 R3 (không đổi chỗ hai nửa ở cuối).
-
-Quy ước bit (đúng như bài giảng): các bit đánh số TỪ TRÁI SANG PHẢI, bắt đầu từ 0.
-    Với 4 bit b0b1b2b3 thì b0 là bit trái nhất. Khối và khóa là số nguyên Python (int);
-    khi in dùng chuỗi nhị phân, bit trái nhất in trước.
-
-Các hàm:
-    Expand : b0b1b2b3        -> b2 b3 b1 b2 b1 b0          (4 -> 6 bit)
-    S-box  : b0b1b2b3b4b5    -> hàng = b0b5, cột = b1b2b3b4 (6 -> 4 bit, bảng 4x16 trong bài giảng)
-    P-box  : b0b1b2b3        -> b2 b0 b3 b1                 (hoán vị 4 bit)
-    Compress (khóa con): k0..k7 -> k5 k1 k3 k2 k7 k0        (8 -> 6 bit)
-Sinh khóa con: K = KL0 KR0 (mỗi nửa 4 bit); vòng 1 dịch trái 1 bit, vòng 2 dịch tiếp 2 bit,
-    vòng 3 dịch tiếp 1 bit (dịch cộng dồn); Ki = Compress(KLi KRi).
-Mã hóa:  L_i = R_{i-1};  R_i = L_{i-1} xor F(R_{i-1}, K_i);  F = P-box(S-box(Expand(R) xor K)).
-Giải mã: R_{i-1} = L_i;  L_{i-1} = R_i xor F(R_{i-1}, K_i), dùng khóa con theo thứ tự K3, K2, K1.
-
-Hàm chính:
-    tinydes_encrypt_block(block, key, trace=None)
-    tinydes_decrypt_block(block, key, trace=None)
-    generate_subkeys(key, trace=None) -> [K1, K2, K3]
-Tham số `trace` là hàm in (vd print) hoặc None; nếu có, in các bước trung gian để đối chiếu bản tính tay.
-"""
 
 # ----------------------------------------------------------------------------
 # Bảng hằng số
