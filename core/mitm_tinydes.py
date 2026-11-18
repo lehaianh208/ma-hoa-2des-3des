@@ -1,19 +1,3 @@
-"""
-mitm_tinydes.py - Tấn công meet-in-the-middle (MITM) lên 2TinyDES với KHÓA ĐẦY ĐỦ (mỗi khóa 8 bit).
-
-TinyDES là phiên bản thu nhỏ DES đã học trên lớp (core/tinydes.py). Không gian khóa 2TinyDES chỉ là
-2^8 x 2^8 = 2^16 = 65 536 cặp khóa, nên chạy được cả vét cạn lẫn MITM để SO SÁNH.
-
-    C = E_K2( E_K1(P) )
-    1. Với MỌI K1: tính X = E_K1(P1), lưu bảng  X -> K1                     (256 mục)
-    2. Với MỌI K2: tính Y = D_K2(C1); nếu Y có trong bảng -> ứng viên (K1, K2)
-    3. Lọc ứng viên bằng cặp known-plaintext thứ 2, 3, ... cho đến khi còn ít ứng viên.
-
-Chi phí: MITM 2 x 2^8 = 512 phép mã/giải mã; vét cạn 2 x 2^16 = 131 072 phép (hơn 250 lần).
-Khối chỉ 8 bit nên một cặp (P, C) chưa đủ: 2^16 / 2^8 = 256 ứng viên "đúng với cặp đầu".
-Với 2DES thật: 2^112 / 2^64 = 2^48 ứng viên sau 1 cặp, nên cần >= 2 cặp.
-"""
-
 import time
 
 from core.tinydes import generate_subkeys, f_function
