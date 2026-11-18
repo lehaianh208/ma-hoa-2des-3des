@@ -1,13 +1,9 @@
-"""des.py - DES tự cài đặt, không dùng thư viện mật mã."""
-
 from core.tables import IP, FP, E, P, PC1, PC2, SHIFTS, SBOXES
-
 
 def bits(x, n, group):
     """Chuỗi nhị phân n bit, chia nhóm `group` bit cho dễ đọc (chỉ dùng để in)."""
     s = format(x, "0%db" % n)
     return " ".join(s[i:i + group] for i in range(0, n, group))
-
 
 def permute(value, table, in_bits):
     """Áp dụng bảng hoán vị `table` lên số nguyên `value` có `in_bits` bit."""
