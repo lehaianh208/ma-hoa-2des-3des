@@ -1,24 +1,3 @@
-"""
-mitm_des.py - Tan cong meet-in-the-middle len 2DES tren DES THAT, voi KHOA RUT GON.
-
-Vi sao phai rut gon?
-  MITM len 2DES day du can bang tra ~2^56 muc (2^56 x 8 byte = 2^59 byte ~ 576 petabyte,
-  chua tinh khoa) va ~2^57 phep tinh -> khong the chay. Vi vay ta dat truoc phan lon bit
-  khoa (ke tan cong biet) va chi de `n_bits` bit chua biet cho MOI khoa:
-
-      khoa 56-bit hieu dung = (phan co dinh 56-n bit) || (n bit chua biet)
-
-  Khoa 56-bit duoc mo rong thanh khoa 64-bit bang cach them bit parity le (DES bo qua bit nay).
-
-So sanh chi phi (n = so bit chua biet moi khoa):
-  Vet can 2DES : 2^(2n) cap khoa, moi cap 2 phep ma hoa        -> ~2^(2n+1) phep
-  MITM         : 2^n (lap bang) + 2^n (tra bang)               -> ~2^(n+1) phep, bo nho 2^n muc
-
-Loc ung vien sai (false positive):
-  Mot cap (P, C) cho ~ 2^(2n) / 2^64 ung vien sai. Voi n nho con xap xi 0, nhung voi khoa 56-bit
-  day du la 2^112 / 2^64 = 2^48 ung vien sai -> BAT BUOC dung >= 2 cap known-plaintext.
-"""
-
 import time
 
 from core.des_fast import fast_subkeys, fast_crypt
