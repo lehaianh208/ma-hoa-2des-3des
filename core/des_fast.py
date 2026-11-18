@@ -1,19 +1,3 @@
-"""
-des_fast.py - Ban DES toi uu bang bang tra (lookup table), dung cho tep lon va MITM.
-
-Day KHONG phai thuat toan khac: moi bang tra duoc SINH RA tu chinh cac bang
-IP, FP, E, P, PC1, PC2, S-box trong des.py, nen ket qua phai trung khop voi des.py
-(co test doi chieu trong tests/test_modes.py).
-
-  - Hoan vi (IP, FP, E, P, PC1, PC2): thay vong lap tung bit bang tra theo tung byte.
-  - S-box va hoan vi P duoc gop thanh 8 bang "SP" (64 phan tu -> 32 bit).
-
-Cach dung:
-    sk = fast_subkeys(key)            # sinh 16 khoa con (1 lan cho moi khoa)
-    c  = fast_crypt(block, sk)        # ma hoa
-    p  = fast_crypt(c, sk[::-1])      # giai ma = khoa con dao nguoc
-"""
-
 from core.des import IP, FP, E, P, PC1, PC2, SHIFTS, SBOXES, permute
 
 _M28 = (1 << 28) - 1
