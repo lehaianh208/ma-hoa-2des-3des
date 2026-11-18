@@ -1,8 +1,4 @@
-"""tables.py - Các bảng hằng số của DES (theo chuẩn NIST FIPS PUB 46-3).
 
-Đây là DỮ LIỆU của chuẩn, không phải thuật toán. Quy ước: số trong bảng đếm từ 1,
-bit số 1 là bit TRÁI NHẤT.
-"""
 
 # Hoán vị đầu (Initial Permutation), 64 -> 64 bit
 IP = [
