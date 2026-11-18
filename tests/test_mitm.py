@@ -1,8 +1,4 @@
-"""
-test_mitm.py - Kiem thu tan cong meet-in-the-middle (bo so nho va DES khoa rut gon).
 
-Chay:  python -m unittest tests.test_mitm -v
-"""
 
 import os
 import sys
