@@ -1,19 +1,3 @@
-"""
-cli.py - Demo dong lenh cho DES / 2DES / 3DES: ma hoa, giai ma MOT khoi 64-bit.
-
-Vi du:
-    python cli.py enc --alg des  --keys 133457799BBCDFF1 --data 0123456789ABCDEF
-    python cli.py dec --alg des  --keys 133457799BBCDFF1 --data 85E813540F0AB405
-    python cli.py enc --alg 2des --keys 133457799BBCDFF1 0E329232EA6D0D73 --data 0123456789ABCDEF
-    python cli.py enc --alg 3des --keys K1 K2 K3 --data ...        (3 khoa)
-    python cli.py enc --alg 3des --keys K1 K2    --data ...        (2 khoa, K3 = K1)
-    python cli.py enc --alg 3des --keys K1       --data ...        (1 khoa, tuong thich DES)
-
-Them --verbose de in cac buoc trung gian (khoa con, L/R tung vong, ham F) de
-doi chieu voi ban tinh tay. Khoi va khoa nhap duoi dang hex 16 ky tu.
-
-Ma hoa tep: xem filecrypt.py.   Tan cong MITM: xem mitm_demo.py.
-"""
 
 import argparse
 import sys
