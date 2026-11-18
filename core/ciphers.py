@@ -1,24 +1,6 @@
-"""
-ciphers.py - Doi tuong ma khoi 64-bit thong nhat cho DES / 2DES / 3DES.
-
-    cipher = make_cipher("3des", [k1, k2, k3])
-    c = cipher.encrypt(block)      # block, c: int 64-bit
-    p = cipher.decrypt(c)
-
-Khoa con duoc sinh MOT LAN khi tao doi tuong (nhanh hon nhieu khi ma hoa ca tep).
-Ben trong dung ban toi uu des_fast.py (da test khop voi des.py / des_multi.py).
-
-Quy uoc so khoa:
-    des  : 1 khoa
-    2des : 2 khoa (K1, K2)                 C = E_K2(E_K1(P))
-    3des : 3 khoa (K1, K2, K3)             C = E_K3(D_K2(E_K1(P)))
-           2 khoa -> K3 = K1;  1 khoa -> K1 = K2 = K3 (tuong thich DES don)
-"""
-
 from core.des_fast import fast_subkeys, fast_crypt
 
 ALGORITHMS = ("des", "2des", "3des")
-
 
 class BlockCipher:
     """Ma khoi 64-bit: chuoi cac tang DES (moi tang la ma hoa hoac giai ma)."""
