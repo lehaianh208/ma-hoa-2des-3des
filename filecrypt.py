@@ -1,18 +1,4 @@
-"""
-filecrypt.py - Ma hoa / giai ma TEP bang DES, 2DES, 3DES (ECB hoac CBC).
 
-Vi du:
-    # Ma hoa roi giai ma lai va so sanh (demo 1 lenh)
-    python filecrypt.py demo --alg 3des --mode cbc --keys 133457799BBCDFF1 0E329232EA6D0D73 FEDCBA9876543210 \
-                             --in samples/sample.txt
-
-    # Ma hoa / giai ma tung buoc
-    python filecrypt.py enc --alg 2des --mode ecb --keys K1 K2 --in samples/sample.txt --out sample.enc
-    python filecrypt.py dec --alg 2des --mode ecb --keys K1 K2 --in sample.enc --out sample.dec.txt
-
-Dinh dang tep ma: CBC = IV(8 byte) || ban ma;  ECB = ban ma. Co padding PKCS#7.
-Khoa: hex 16 ky tu; DES 1 khoa, 2DES 2 khoa, 3DES 1-3 khoa.
-"""
 
 import argparse
 import sys
