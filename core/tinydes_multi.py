@@ -1,19 +1,4 @@
-"""
-tinydes_multi.py - 2TinyDES và 3TinyDES: cùng cách ghép như 2DES, 3DES nhưng xây trên TinyDES (core/tinydes.py).
 
-    2TinyDES: C = E_K2( E_K1(P) )          P = D_K1( D_K2(C) )
-    3TinyDES:  C = E_K3( D_K2( E_K1(P) ) )  (dạng EDE)
-             P = D_K1( E_K2( D_K3(C) ) )
-
-Ba kiểu khóa của 3TinyDES (giống 3DES):
-    - 3 khóa độc lập : K1, K2, K3 khác nhau
-    - 2 khóa         : K3 = K1
-    - 1 khóa         : K1 = K2 = K3  ->  E(D(E(P))) = E(P), tương thích ngược với TinyDES đơn
-
-Khối là int 8 bit, mỗi khóa là int 8 bit (xem tinydes.py).
-Vì TinyDES chỉ có 8 bit khóa nên 2TinyDES có không gian khóa 2^16: đủ nhỏ để CHẠY THẬT cả vét cạn
-lẫn MITM trên khóa đầy đủ (xem core/mitm_tinydes.py) - điều không làm được với 2DES thật (2^112).
-"""
 
 from core.tinydes import tinydes_encrypt_block, tinydes_decrypt_block
 
