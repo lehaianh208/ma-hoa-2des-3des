@@ -1,17 +1,4 @@
-"""
-modes.py - Che do hoat dong ECB / CBC va padding PKCS#7, de ma hoa du lieu/tep that.
 
-Cac ham muc thap nhan HAM MA HOA MOT KHOI (int -> int) lam tham so, nen dung duoc voi
-DES, 2DES, 3DES hoac bat ky ma khoi 64-bit nao (xem core/ciphers.py).
-
-  ECB:  C_i = E(P_i)                 -> cac khoi giong nhau cho ban ma giong nhau (lo mau)
-  CBC:  C_i = E(P_i xor C_{i-1}),    C_0 = IV  (ngau nhien, gui kem ban ma)
-
-Dinh dang ban ma do encrypt_bytes tao ra:
-    ECB: ban ma
-    CBC: IV (8 byte) || ban ma
-Moi ban ro deu duoc padding PKCS#7 (them 1..8 byte, moi byte = so byte them).
-"""
 
 import os
 
