@@ -1,23 +1,4 @@
-"""
-server.py - Web server cho demo DES / 2DES / 3DES + MITM. Chi dung thu vien chuan.
 
-Chay (tu thu muc goc cua project):
-    python -m app.server              # http://127.0.0.1:8000
-    python -m app.server --port 9000
-
-Phan thuat toan nam hoan toan o core/; file nay chi lam giao dien HTTP/JSON.
-
-API (JSON):
-    POST /api/block      ma/giai ma 1 khoi 64-bit, co the tra ve trace tung buoc
-    POST /api/tblock     TinyDES / 2TinyDES / 3TinyDES (ban thu nho cua lop): khoi 8-bit, khoa 8-bit, co trace
-    POST /api/tmitm      MITM len 2TinyDES voi khoa day du 8 bit (co the chay them vet can)
-    POST /api/sblock     S-DES / 2S-DES / 3S-DES (ban thu nho bo sung): khoi 8-bit, khoa 10-bit, co trace
-    POST /api/smitm      MITM len 2S-DES voi khoa day du 10 bit (co the chay them vet can)
-    POST /api/crypt      ma/giai ma van ban hoac tep (base64), ECB/CBC, do thoi gian
-    POST /api/mitm       MITM do choi 4-bit hoac MITM len DES khoa rut gon
-    POST /api/benchmark  do thoi gian theo kich thuoc du lieu
-    GET  /api/selftest   doi chieu test vector chuan
-"""
 
 import argparse
 import base64
