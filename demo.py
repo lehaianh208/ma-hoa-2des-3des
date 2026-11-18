@@ -1,10 +1,3 @@
-"""demo.py - Chạy lần lượt các bước demo (thay cho demo.bat khi Windows chặn file .bat).
-
-Cách chạy (từ thư mục gốc project):
-    python demo.py            chạy tất cả các mục, dừng chờ Enter giữa các mục
-    python demo.py 1 5        chỉ chạy mục 1 và mục 5 (để tập từng đoạn)
-Trong PyCharm: bấm chuột phải file này -> Run 'demo'.
-"""
 
 import glob
 import os
