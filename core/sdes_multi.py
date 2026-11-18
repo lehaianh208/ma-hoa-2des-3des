@@ -1,19 +1,4 @@
-"""
-sdes_multi.py - 2S-DES và 3S-DES: cùng cách ghép như 2DES, 3DES nhưng xây trên S-DES (core/sdes.py).
 
-    2S-DES:  C = E_K2( E_K1(P) )          P = D_K1( D_K2(C) )
-    3S-DES:  C = E_K3( D_K2( E_K1(P) ) )  (dạng EDE)
-             P = D_K1( E_K2( D_K3(C) ) )
-
-Ba kiểu khóa của 3S-DES (giống 3DES):
-    - 3 khóa độc lập : K1, K2, K3 khác nhau
-    - 2 khóa         : K3 = K1
-    - 1 khóa         : K1 = K2 = K3  ->  E(D(E(P))) = E(P), tương thích ngược với S-DES đơn
-
-Khối là int 8 bit, mỗi khóa là int 10 bit (xem sdes.py).
-Vì S-DES chỉ có 10 bit khóa nên 2S-DES có không gian khóa 2^20: đủ nhỏ để CHẠY THẬT cả vét cạn
-lẫn MITM trên khóa đầy đủ (xem core/mitm_sdes.py) - điều không làm được với 2DES thật (2^112).
-"""
 
 from core.sdes import sdes_encrypt_block, sdes_decrypt_block
 
