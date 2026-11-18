@@ -1,18 +1,3 @@
-"""
-test_tinydes.py - Kiem thu TinyDES (phien ban thu nho cua lop), 2TinyDES, 3TinyDES va MITM tren khoa 8 bit day du.
-
-Chay:  python -m unittest tests.test_tinydes -v
-
-Cac ca kiem thu do nhom tu viet:
-  1. Vi du tren lop (bai giang): P = 5C, K = 9A -> K1,K2,K3 va C = 92, tung vong.
-  2. Bai 9 trong file bai tap: K1,K2,K3, C = 8E, giai ma ve ban ro, va cach 'chay lai so do ma hoa voi khoa dao'
-     cho 01110100 (khac ban ro).
-  3. Cac ham thanh phan theo vi du trong bai giang: Expand(0110) = 101110, S-box(101010) = 0110.
-  4. Giai ma khoi phuc dung ban ro voi MOI khoa 8 bit x MOI khoi 8 bit.
-  5. Moi khoa la mot hoan vi cua 256 khoi.
-  6. 2TinyDES, 3TinyDES (3 khoa / 2 khoa / 1 khoa) va MITM khop voi vet can.
-  7. Doi chieu cheo voi mot cai dat viet theo cach khac (chuoi ky tu) - tuong ung 'doi chieu thu vien'.
-"""
 
 import os
 import random
