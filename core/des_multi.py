@@ -1,20 +1,4 @@
-"""
-des_multi.py - 2DES va 3DES xay dung tren loi DES (core/des.py).
-
-  2DES:  C = E_K2( E_K1(P) )          P = D_K1( D_K2(C) )
-  3DES:  C = E_K3( D_K2( E_K1(P) ) )  (dang EDE)
-         P = D_K1( E_K2( D_K3(C) ) )
-
-Ba kieu khoa cua 3DES:
-  - 3 khoa doc lap : K1, K2, K3 khac nhau       (~112-bit hieu dung vi MITM)
-  - 2 khoa         : K3 = K1                    (~80-bit theo uoc luong NIST)
-  - 1 khoa         : K1 = K2 = K3 -> E(D(E(P))) = E(P), tuong thich nguoc voi DES don
-
-Khoa va khoi deu la int 64-bit (xem des.py).
-"""
-
 from core.des import des_encrypt_block, des_decrypt_block
-
 
 # ----------------------------------------------------------------------------
 # 2DES
@@ -83,7 +67,7 @@ def decrypt_3des_1key(block, k, trace=None):
 
 
 # ----------------------------------------------------------------------------
-# Ham tien ich chung cho CLI va web: ma/giai ma MOT khoi 64-bit (co trace)
+# Ham chung cho CLI va web: ma/giai ma MOT khoi 64-bit (co trace)
 # ----------------------------------------------------------------------------
 
 def crypt_block(alg, op, keys, block, trace=None):
