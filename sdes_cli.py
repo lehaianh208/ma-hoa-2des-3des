@@ -1,19 +1,3 @@
-"""
-sdes_cli.py - Demo dòng lệnh cho S-DES / 2S-DES / 3S-DES (PHIÊN BẢN THU NHỎ của DES).
-
-Khối 8 bit, khóa 10 bit, nhập và in dưới dạng chuỗi nhị phân.
-
-Ví dụ (ví dụ chuẩn trong giáo trình):
-    python sdes_cli.py enc --alg sdes  --keys 1010000010 --data 01110010 --verbose
-    python sdes_cli.py dec --alg sdes  --keys 1010000010 --data 01110111
-    python sdes_cli.py enc --alg 2sdes --keys 1010000010 0110111001 --data 01110010
-    python sdes_cli.py enc --alg 3sdes --keys K1 K2 K3 --data ...      (3 khóa)
-    python sdes_cli.py enc --alg 3sdes --keys K1 K2    --data ...      (2 khóa, K3 = K1)
-    python sdes_cli.py enc --alg 3sdes --keys K1       --data ...      (1 khóa, tương thích S-DES)
-
-Thêm --verbose để in các bước trung gian (khóa con, IP, từng vòng, S-box...) đối chiếu với bản tính tay.
-Với DES đầy đủ xem cli.py;  tấn công MITM xem mitm_demo.py (sdes).
-"""
 
 import argparse
 import sys
