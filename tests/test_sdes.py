@@ -1,16 +1,3 @@
-"""
-test_sdes.py - Kiem thu S-DES, 2S-DES, 3S-DES (phien ban thu nho) va MITM tren khoa 10 bit day du.
-
-Chay:  python -m unittest tests.test_sdes -v
-
-Cac ca kiem thu do nhom tu viet:
-  1. Vi du chuan trong giao trinh (khoa con va ban ma).
-  2. Giai ma khoi phuc dung ban ro voi MOI khoa 10 bit x MOI khoi 8 bit.
-  3. Moi khoa la mot hoan vi cua 256 khoi (ma hoa khong mat thong tin).
-  4. 2S-DES, 3S-DES: cong thuc va ba kieu khoa; 3S-DES 1 khoa trung S-DES.
-  5. MITM tim ra khoa that va khop voi vet can.
-  6. Doi chieu cheo voi mot cai dat viet theo cach khac (chuoi ky tu) - tuong ung 'doi chieu thu vien'.
-"""
 
 import os
 import random
