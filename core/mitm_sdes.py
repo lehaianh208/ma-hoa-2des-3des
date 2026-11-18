@@ -1,19 +1,3 @@
-"""
-mitm_sdes.py - Tấn công meet-in-the-middle (MITM) lên 2S-DES với KHÓA ĐẦY ĐỦ (mỗi khóa 10 bit).
-
-Đây là bản MITM "thật" chạy được trên máy: không gian khóa của 2S-DES chỉ là 2^10 x 2^10 = 2^20.
-Vét cạn thử 2^20 cặp khóa; MITM chỉ cần 2 x 2^10 phép mã/giải mã.
-
-    C = E_K2( E_K1(P) )
-    1. Với MỌI K1: tính X = E_K1(P1), lưu bảng  X -> K1                     (1024 mục)
-    2. Với MỌI K2: tính Y = D_K2(C1); nếu Y có trong bảng -> ứng viên (K1, K2)
-    3. Lọc ứng viên bằng cặp known-plaintext thứ 2, 3, ... cho đến khi còn 1.
-
-Vì sao một cặp (P, C) chưa đủ: khối chỉ 8 bit nên có 2^20 / 2^8 = 2^12 = 4096 ứng viên "đúng với
-cặp đầu"; mỗi cặp thêm loại bớt khoảng 255/256 số ứng viên. Cần khoảng 3 cặp để còn 1 ứng viên.
-(Với 2DES thật: 2^112 / 2^64 = 2^48 ứng viên sau 1 cặp, cần >= 2 cặp.)
-"""
-
 import time
 
 from core.sdes import generate_subkeys, _crypt_block
