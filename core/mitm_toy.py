@@ -1,27 +1,3 @@
-"""
-mitm_toy.py - Tan cong meet-in-the-middle (MITM) tren "ma do choi" 4-bit de TINH TAY duoc.
-
-DAY KHONG PHAI MOT PHIEN BAN HE MA THU HAI. Day la mot hop den nho dung de minh hoa
-nguyen ly MITM vao 2DES, ung voi ban tinh tay "phan C" cua bao cao. MITM that duoc chay
-tren DES day du o core/mitm_des.py.
-
-Ma do choi (khoi 4-bit, khoa 4-bit):
-        E_k(x) = S[x XOR k]          D_k(y) = Sinv[y] XOR k
-    S la S-box 4-bit cua he ma PRESENT (co dinh, tra bang duoc bang tay).
-
-Ma kep (giong 2DES):   C = E_k2( E_k1(P) )  = S[ S[P xor k1] xor k2 ]
-
-MITM:
-  1. Voi MOI k1: tinh X = E_k1(P1), luu bang  X -> k1        (16 muc)
-  2. Voi MOI k2: tinh Y = D_k2(C1); neu Y trung mot X da luu -> ung vien (k1, k2)
-  3. Loc cac ung vien bang cap known-plaintext thu 2, thu 3, ... cho den khi con 1 ung vien.
-Tong chi 2*16 = 32 phep ma/giai ma thay vi 16*16 = 256 phep neu vet can.
-"""
-
-S = [0xC, 0x5, 0x6, 0xB, 0x9, 0x0, 0xA, 0xD, 0x3, 0xE, 0xF, 0x8, 0x4, 0x7, 0x1, 0x2]
-S_INV = [S.index(v) for v in range(16)]
-KEY_SPACE = 16
-
 
 def enc(x, k):
     """E_k(x) = S[x xor k]."""
