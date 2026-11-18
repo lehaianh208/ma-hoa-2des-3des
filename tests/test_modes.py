@@ -1,11 +1,3 @@
-"""
-test_modes.py - Kiem thu ECB/CBC, padding, ma hoa tep va ban toi uu des_fast.
-
-Chay:  python -m unittest tests.test_modes -v
-
-Thu vien mat ma (`cryptography`) CHI duoc import o day de doi chieu; neu may khong co thi
-cac ca doi chieu bi bo qua (skip), khong anh huong cac ca con lai.
-"""
 
 import os
 import random
