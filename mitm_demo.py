@@ -1,16 +1,4 @@
-"""
-mitm_demo.py - Demo tan cong meet-in-the-middle (MITM) len 2DES.
 
-    python mitm_demo.py toy                      # bo so nho 4-bit, in tung buoc (khop ban tinh tay)
-    python mitm_demo.py des --bits 12            # DES that, moi khoa chi con 12 bit chua biet
-    python mitm_demo.py des --bits 16 --seed 5   # ~ vai giay
-    python mitm_demo.py des --bits 8 --brute     # chay ca vet can that de so sanh (chi voi bits <= 9)
-    python mitm_demo.py sdes                     # 2S-DES voi KHOA DAY DU 10 bit: MITM that, ~0.05 giay
-    python mitm_demo.py sdes --brute             # them vet can 2^20 cap khoa de so sanh (~10 giay)
-
-Vi sao phai rut gon khoa: MITM len 2DES day du can ~2^56 muc bang tra (~576 petabyte
-neu chi luu gia tri trung gian), khong the chay.
-"""
 
 import argparse
 import random
