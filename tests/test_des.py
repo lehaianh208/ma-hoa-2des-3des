@@ -1,13 +1,4 @@
-"""
-test_des.py - Kiem thu loi DES / 2DES / 3DES.
 
-Chay:
-    python -m unittest tests.test_des -v      # chay cac ca kiem thu
-    python tests/test_des.py --compare        # in bang doi chieu "khop/lech" voi thu vien
-
-LUU Y: thu vien mat ma (PyCryptodome) CHI duoc import trong file nay de DOI CHIEU,
-tuyet doi khong import trong thu muc core/.
-"""
 
 import os
 import random
